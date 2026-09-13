@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Kids Drawing Fun</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: "Comic Sans MS", Arial, sans-serif;
+        background: linear-gradient(135deg, #ffecd2, #fcb69f);
+        min-height: 100vh;
+        color: #333;
+    }
+
+    header {
+        text-align: center;
+        padding: 18px;
+        background: #ff6b6b;
+        color: white;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    header h1 {
+        margin: 0;
+        font-size: 34px;
+    }
+
+    header p {
+        margin: 5px 0 0;
+        font-size: 17px;
+    }
+
+    .app {
+        width: 95%;
+        max-width: 1100px;
+        margin: 20px auto;
+    }
+
+    .toolbar {
+        background: white;
+        padding: 15px;
+        border-radius: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        margin-bottom: 18px;
+    }
+
+    .tool-group {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 5px 10px;
+        border-radius: 12px;
+        background: #f4f4f4;
+    }
+
+    button {
+        border: none;
+        padding: 10px 15px;
+        border-radius: 12px;
+        font-family: inherit;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.15s, opacity 0.15s;
+    }
+
+    button:hover {
+        transform: scale(1.06);
+        opacity: 0.9;
+    }
+
+    .color-btn {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: 3px solid white;
+        box-shadow: 0 0 0 2px #aaa;
+    }
+
+    .red { background: #ff3b30; }
+    .orange { background: #ff9500; }
+    .yellow { background: #ffd60a; }
+    .green { background: #34c759; }
+    .blue { background: #007aff; }
+    .purple { background: #af52de; }
+    .pink { background: #ff2d55; }
+    .black { background: #000; }
+    .brown { background: #8b4513; }
+
+    #customColor {
+        width: 42px;
+        height: 38px;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+    }
+
+    .action {
+        background: #4dabf7;
+        color: white;
+    }
+
+    .undo {
+        background: #845ef7;
+        color: white;
+    }
+
+    .redo {
+        background: #20c997;
+        color: white;
+    }
+
+    .erase {
+        background: #adb5bd;
+        color: white;
+    }
+
+    .clear {
+        background: #ff6b6b;
+        color: white;
+    }
+
+    .save {
+        background: #51cf66;
+        color: white;
+    }
+
+    .stamp {
+        background: #ffd43b;
+        color: #333;
+    }
+
+    .canvas-container {
+        background: white;
+        padding: 15px;
+        border-radius: 20px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+
+    canvas {
+        display: block;
+        width: 100%;
+        height: 600px;
+        background: white;
+        border: 5px dashed #74c0fc;
+        border-radius: 15px;
+        cursor: crosshair;
+        touch-action: none;
+    }
+
+    .message {
+        text-align: center;
+        margin: 15px;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .size-label {
+        font-weight: bold;
+    }
+
+    input[type="range"] {
+        width: 120px;
+        accent-color: #ff6b6b;
+    }
+
+    @media (max-width: 600px) {
+
+        header h1 {
+            font-size: 26px;
+        }
+
+        canvas {
+            height: 450px;
+        }
+
+        .toolbar {
+            padding: 10px;
+        }
+
+        button {
+            padding: 8px 11px;
+            font-size: 14px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🎨 Kids Drawing Fun! 🖍️</h1>
+    <p>Draw, color and have fun!</p>
+</header>
+
+<div class="app">
+
+    <div class="toolbar">
+
+        <!-- Colors -->
+        <div class="tool-group">
+
+            <button class="color-btn red" data-color="#ff3b30"></button>
+            <button class="color-btn orange" data-color="#ff9500"></button>
+            <button class="color-btn yellow" data-color="#ffd60a"></button>
+            <button class="color-btn green" data-color="#34c759"></button>
+            <button class="color-btn blue" data-color="#007aff"></button>
+            <button class="color-btn purple" data-color="#af52de"></button>
+            <button class="color-btn pink" data-color="#ff2d55"></button>
+            <button class="color-btn brown" data-color="#8b4513"></button>
+            <button class="color-btn black" data-color="#000000"></button>
+
+            <input type="color" id="customColor" value="#ff0000">
+
+        </div>
+
+        <!-- Brush size -->
+        <div class="tool-group">
+
+            <span class="size-label">🖌️ Size:</span>
+
+            <input
+                type="range"
+                id="brushSize"
+                min="2"
+                max="50"
+                value="8"
+            >
+
+            <span id="sizeValue">8</span>
+
+        </div>
+
+        <!-- Actions -->
+        <button class="erase" id="eraser">
+            🧽 Eraser
+        </button>
+
+        <button class="undo" id="undo">
+            ↩️ Undo
+        </button>
+
+        <button class="redo" id="redo">
+            ↪️ Redo
+        </button>
+
+        <button class="clear" id="clear">
+            🗑️ Clear
+        </button>
+
+        <button class="save" id="save">
+            💾 Save
+        </button>
+
+        <!-- Stamps -->
+        <button class="stamp" data-stamp="⭐">⭐</button>
+        <button class="stamp" data-stamp="❤️">❤️</button>
+        <button class="stamp" data-stamp="🌈">🌈</button>
+        <button class="stamp" data-stamp="☀️">☀️</button>
+        <button class="stamp" data-stamp="🌸">🌸</button>
+
+    </div>
+
+    <div class="canvas-container">
+        <canvas id="drawingCanvas"></canvas>
+    </div>
+
+    <div class="message">
+        🌟 Have fun creating your masterpiece! 🌟
+    </div>
+
+</div>
+
+<script>
+
+const canvas = document.getElementById("drawingCanvas");
+const ctx = canvas.getContext("2d");
+
+let drawing = false;
+
+let currentColor = "#ff3b30";
+let brushSize = 8;
+let erasing = false;
+
+let history = [];
+let redoHistory = [];
+
+
+// -------------------------
+// Canvas setup
+// -------------------------
+
+function resizeCanvas() {
+
+    const oldImage = canvas.toDataURL();
+
+    const rect = canvas.getBoundingClientRect();
+
+    canvas.width = rect.width * window.devicePixelRatio;
+    canvas.height = rect.height * window.devicePixelRatio;
+
+    ctx.scale(
+        window.devicePixelRatio,
+        window.devicePixelRatio
+    );
+
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    ctx.fillStyle = "white";
+
+    ctx.fillRect(
+        0,
+        0,
+        rect.width,
+        rect.height
+    );
+
+    if (history.length > 0) {
+        restoreImage(history[history.length - 1]);
+    }
+}
+
+resizeCanvas();
+
+
+// -------------------------
+// Get mouse/touch position
+// -------------------------
+
+function getPosition(event) {
+
+    const rect = canvas.getBoundingClientRect();
+
+    let clientX;
+    let clientY;
+
+    if (event.touches) {
+        clientX = event.touches[0].clientX;
+        clientY = event.touches[0].clientY;
+    } else {
+        clientX = event.clientX;
+        clientY = event.clientY;
+    }
+
+    return {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+    };
+}
+
+
+// -------------------------
+// Start drawing
+// -------------------------
+
+function startDrawing(event) {
+
+    event.preventDefault();
+
+    drawing = true;
+
+    const pos = getPosition(event);
+
+    ctx.beginPath();
+
+    ctx.moveTo(pos.x, pos.y);
+
+    saveState();
+}
+
+
+// -------------------------
+// Draw
+// -------------------------
+
+function draw(event) {
+
+    if (!drawing) return;
+
+    event.preventDefault();
+
+    const pos = getPosition(event);
+
+    ctx.lineWidth = brushSize;
+
+    if (erasing) {
+        ctx.strokeStyle = "white";
+    } else {
+        ctx.strokeStyle = currentColor;
+    }
+
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+}
+
+
+// -------------------------
+// Stop drawing
+// -------------------------
+
+function stopDrawing() {
+
+    if (!drawing) return;
+
+    drawing = false;
+
+    ctx.closePath();
+}
+
+
+// Mouse events
+canvas.addEventListener("mousedown", startDrawing);
+canvas.addEventListener("mousemove", draw);
+canvas.addEventListener("mouseup", stopDrawing);
+canvas.addEventListener("mouseleave", stopDrawing);
+
+
+// Touch events
+canvas.addEventListener("touchstart", startDrawing, {
+    passive: false
+});
+
+canvas.addEventListener("touchmove", draw, {
+    passive: false
+});
+
+canvas.addEventListener("touchend", stopDrawing);
+
+
+// -------------------------
+// Color buttons
+// -------------------------
+
+document.querySelectorAll(".color-btn").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        currentColor = button.dataset.color;
+
+        erasing = false;
+
+    });
+
+});
+
+
+// Custom color
+document.getElementById("customColor")
+    .addEventListener("input", function() {
+
+        currentColor = this.value;
+
+        erasing = false;
+
+    });
+
+
+// -------------------------
+// Brush size
+// -------------------------
+
+const brushSlider =
+    document.getElementById("brushSize");
+
+const sizeValue =
+    document.getElementById("sizeValue");
+
+brushSlider.addEventListener("input", function() {
+
+    brushSize = this.value;
+
+    sizeValue.textContent = this.value;
+
+});
+
+
+// -------------------------
+// Eraser
+// -------------------------
+
+document.getElementById("eraser")
+    .addEventListener("click", function() {
+
+        erasing = !erasing;
+
+        this.textContent =
+            erasing ? "🖍️ Drawing" : "🧽 Eraser";
+
+    });
+
+
+// -------------------------
+// Save state
+// -------------------------
+
+function saveState() {
+
+    history.push(canvas.toDataURL());
+
+    if (history.length > 30) {
+        history.shift();
+    }
+
+    redoHistory = [];
+
+}
+
+
+// -------------------------
+// Restore image
+// -------------------------
+
+function restoreImage(data) {
+
+    const image = new Image();
+
+    image.onload = function() {
+
+        const rect = canvas.getBoundingClientRect();
+
+        ctx.clearRect(
+            0,
+            0,
+            rect.width,
+            rect.height
+        );
+
+        ctx.drawImage(
+            image,
+            0,
+            0,
+            rect.width,
+            rect.height
+        );
+
+    };
+
+    image.src = data;
+
+}
+
+
+// -------------------------
+// Undo
+// -------------------------
+
+document.getElementById("undo")
+    .addEventListener("click", function() {
+
+        if (history.length <= 1) return;
+
+        const current = history.pop();
+
+        redoHistory.push(current);
+
+        restoreImage(
+            history[history.length - 1]
+        );
+
+    });
+
+
+// -------------------------
+// Redo
+// -------------------------
+
+document.getElementById("redo")
+    .addEventListener("click", function() {
+
+        if (redoHistory.length === 0) return;
+
+        const state = redoHistory.pop();
+
+        history.push(state);
+
+        restoreImage(state);
+
+    });
+
+
+// -------------------------
+// Clear canvas
+// -------------------------
+
+document.getElementById("clear")
+    .addEventListener("click", function() {
+
+        const answer = confirm(
+            "Do you want to clear your drawing? 🗑️"
+        );
+
+        if (!answer) return;
+
+        const rect = canvas.getBoundingClientRect();
+
+        ctx.fillStyle = "white";
+
+        ctx.fillRect(
+            0,
+            0,
+            rect.width,
+            rect.height
+        );
+
+        saveState();
+
+    });
+
+
+// -------------------------
+// Save drawing
+// -------------------------
+
+document.getElementById("save")
+    .addEventListener("click", function() {
+
+        const link =
+            document.createElement("a");
+
+        link.download = "my-kids-drawing.png";
+
+        link.href = canvas.toDataURL("image/png");
+
+        link.click();
+
+    });
+
+
+// -------------------------
+// Fun stamps
+// -------------------------
+
+document.querySelectorAll(".stamp")
+    .forEach(button => {
+
+        button.addEventListener("click", function() {
+
+            const stamp = this.dataset.stamp;
+
+            canvas.addEventListener(
+                "click",
+                placeStamp
+            );
+
+            function placeStamp(event) {
+
+                const pos = getPosition(event);
+
+                ctx.font = "45px Arial";
+
+                ctx.textAlign = "center";
+
+                ctx.textBaseline = "middle";
+
+                ctx.fillText(
+                    stamp,
+                    pos.x,
+                    pos.y
+                );
+
+                saveState();
+
+                canvas.removeEventListener(
+                    "click",
+                    placeStamp
+                );
+
+            }
+
+        });
+
+    });
+
+
+// Prevent accidental page scrolling
+canvas.addEventListener(
+    "touchmove",
+    function(event) {
+        event.preventDefault();
+    },
+    { passive: false }
+);
+
+</script>
+
+</body>
+</html>
+
